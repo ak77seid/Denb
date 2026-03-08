@@ -90,43 +90,142 @@
                     </div>
                 </div>
             </div>
+            {{-- Result Area --}}
+            <div class="row justify-content-center mt-4" id="resultArea" style="display:none !important;"></div>
         </div>
-    </div>
 </section>
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Load recent searches from localStorage
-            loadRecentSearches();
+        const trackForm = document.getElementById('trackForm');
+        const resultArea = document.getElementById('resultArea');
 
-            // Handle form submission with AJAX
-            const form = document.getElementById('trackForm');
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+        // Auto-search if ticket param in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('ticket')) {
+            document.getElementById('ticket_number').value = urlParams.get('ticket');
+            submitTicketSearch(urlParams.get('ticket'));
+        }
 
-                const ticketNumber = document.getElementById('ticket_number').value;
-
-                // Store in recent searches
-                saveToRecentSearches(ticketNumber);
-
-                // Submit form normally
-                this.submit();
-            });
+        trackForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const ticket = document.getElementById('ticket_number').value.trim();
+            if (!ticket) return;
+            saveToRecentSearches(ticket);
+            submitTicketSearch(ticket);
         });
+
+        function submitTicketSearch(ticket) {
+            const btn = trackForm.querySelector('button[type=submit]');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>በመፈለግ ላይ...';
+            btn.disabled = true;
+
+            fetch('{{ route("complaint.check") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ ticket_number: ticket })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    btn.innerHTML = '<i class="bi bi-search me-2"></i>ፈልግ';
+                    btn.disabled = false;
+                    renderResult(data);
+                })
+                .catch(() => {
+                    btn.innerHTML = '<i class="bi bi-search me-2"></i>ፈልግ';
+                    btn.disabled = false;
+                    resultArea.style.display = '';
+                    resultArea.innerHTML = `<div class="col-lg-10">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        ስህተት ተከስቷል፣ እባክዎ ደግመው ይሞክሩ።
+                    </div>
+                </div>`;
+                });
+        }
+
+        function renderResult(data) {
+            resultArea.style.display = '';
+
+            if (!data.found) {
+                resultArea.innerHTML = `<div class="col-lg-10">
+                    <div class="alert alert-warning d-flex align-items-center gap-3">
+                        <i class="bi bi-search fs-3"></i>
+                        <div>
+                            <strong>ቲኬቱ አልተገኘም</strong><br>
+                            <span class="small">ያስገቡት የቲኬት ቁጥር “${document.getElementById('ticket_number').value}” ልክ አይደለም። እባክዎ ደግመው ይሞክሩ።</span>
+                        </div>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            const statusColors = { success: 'success', warning: 'warning', info: 'info', primary: 'primary', secondary: 'secondary', danger: 'danger' };
+            const color = statusColors[data.status_color] || 'secondary';
+            const resolvedHtml = data.resolved_at ? `
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">የተፈታበት ቀን</small>
+                        <strong>${data.resolved_at}</strong>
+                    </div>
+                </div>` : '';
+            const resolutionHtml = data.resolution ? `
+                <div class="mt-3 p-3 bg-light rounded border-start border-success border-3">
+                    <small class="text-muted d-block fw-bold">የመፍትሄ ሃሳብ</small>
+                    <p class="mb-0 mt-1">${data.resolution}</p>
+                </div>` : '';
+
+            resultArea.innerHTML = `
+                <div class="col-lg-10">
+                    <div class="card shadow-sm border-0 overflow-hidden">
+                        <div class="card-header py-3" style="background: linear-gradient(135deg, #0d2340, #1e3a5f); border-left: 5px solid #4facfe;">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <div>
+                                    <h5 class="mb-0 text-white fw-bold"><i class="bi bi-ticket-perforated me-2"></i>${data.ticket_number}</h5>
+                                    <small class="text-white" style="opacity:0.75">የቅሬታ ሁኔታ — የቀረበበት ቀን: ${data.created_at}</small>
+                                </div>
+                                <span class="badge bg-${color} fs-6 px-3 py-2">${data.status}</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded">
+                                        <small class="text-muted d-block">አመልካች</small>
+                                        <strong>${data.full_name}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded">
+                                        <small class="text-muted d-block">የቅድሚያ ደረጃ</small>
+                                        <strong>${data.priority}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 bg-light rounded">
+                                        <small class="text-muted d-block">የመጨረሻ ለውጥ</small>
+                                        <strong>${data.last_update}</strong>
+                                    </div>
+                                </div>
+                                ${resolvedHtml}
+                            </div>
+                            ${resolutionHtml}
+                        </div>
+                    </div>
+                </div>`;
+
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         function saveToRecentSearches(ticket) {
             let searches = JSON.parse(localStorage.getItem('recentTicketSearches') || '[]');
-
-            // Remove if already exists
             searches = searches.filter(t => t !== ticket);
-
-            // Add to beginning
             searches.unshift(ticket);
-
-            // Keep only last 5
             searches = searches.slice(0, 5);
-
             localStorage.setItem('recentTicketSearches', JSON.stringify(searches));
             loadRecentSearches();
         }
@@ -134,25 +233,23 @@
         function loadRecentSearches() {
             const searches = JSON.parse(localStorage.getItem('recentTicketSearches') || '[]');
             const container = document.getElementById('recentSearches');
-
+            if (!container) return;
             if (searches.length === 0) {
                 container.innerHTML = '<p class="text-muted small">ምንም የቅርብ ጊዜ ፍለጋ የለም</p>';
                 return;
             }
-
             let html = '<div class="list-group">';
             searches.forEach(ticket => {
-                html += `
-                                            <a href="{{ route('complaint.track') }}?ticket=${ticket}" 
-                                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                                ${ticket}
-                                                <i class="bi bi-arrow-right"></i>
-                                            </a>
-                                        `;
+                html += `<a href="javascript:void(0)" onclick="document.getElementById('ticket_number').value='${ticket}';submitTicketSearch('${ticket}')" 
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    ${ticket}
+                    <i class="bi bi-arrow-right"></i>
+                </a>`;
             });
             html += '</div>';
-
             container.innerHTML = html;
         }
+
+        document.addEventListener('DOMContentLoaded', loadRecentSearches);
     </script>
 @endpush

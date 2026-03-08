@@ -31,14 +31,17 @@ class ComplaintController extends Controller
             'phone' => 'required|string|max:20',
             'id_number' => 'nullable|string|max:50',
             'address' => 'nullable|string|max:500',
-            'complaint_type' => 'required|string|in:goods_confiscation,officer_misconduct,service_delivery,uniform_issue,salary_issue,harassment,other',
+            'complaint_type' => 'required|string|in:illegal_trade,corruption,misconduct,property_dispute,harassment,fraud,environmental,other',
             'complaint_type_other' => 'required_if:complaint_type,other|nullable|string|max:255',
             'incident_date' => 'required|date|before_or_equal:today',
             'incident_location' => 'required|string|max:255',
             'officer_name' => 'nullable|string|max:255',
             'officer_badge' => 'nullable|string|max:50',
+            'subject' => 'required|string|max:255',
             'description' => 'required|string|max:5000',
-            'attachments.*' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,pdf,doc,docx',
+            'evidence_description' => 'nullable|string|max:1000',
+            'priority' => 'required|string|in:low,medium,high,critical',
+            'attachments.*' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,txt',
             'confiscated_items' => 'nullable|string|max:500',
             'confiscated_value' => 'nullable|numeric|min:0',
             'confiscation_reason' => 'nullable|string|max:255',
@@ -70,7 +73,7 @@ class ComplaintController extends Controller
 
                 $attachments[] = $path;
             }
-            $data['attachments'] = json_encode($attachments);
+            $data['attachments'] = $attachments;
         }
 
         // Set anonymous flag

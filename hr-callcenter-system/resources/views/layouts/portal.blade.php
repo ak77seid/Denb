@@ -228,6 +228,51 @@
             border-radius: 12px;
         }
 
+        /* Premium Form Section Headers */
+        .form-section-header {
+            background: linear-gradient(135deg, #0d2340 0%, #1e3a5f 50%, #245080 100%);
+            padding: 20px 28px;
+            border-radius: 12px 12px 0 0;
+            border-left: 5px solid #4facfe;
+            box-shadow: inset 0 -2px 12px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-section-header h5 {
+            font-size: 1.15rem;
+            font-weight: 700 !important;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+            color: #ffffff !important;
+        }
+
+        .form-section-header h5 i {
+            color: #4facfe;
+            filter: drop-shadow(0 0 4px rgba(79, 172, 254, 0.5));
+        }
+
+        .form-section-header small {
+            color: rgba(255, 255, 255, 0.75) !important;
+            font-style: italic;
+        }
+
+        /* Numbered Step Badge */
+        .form-step-badge {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            text-shadow: none;
+            box-shadow: 0 0 12px rgba(79, 172, 254, 0.3);
+        }
+
         .status-badge {
             font-size: 0.85rem;
             padding: 6px 14px;

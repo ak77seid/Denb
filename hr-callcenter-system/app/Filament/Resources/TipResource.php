@@ -336,10 +336,13 @@ class TipResource extends Resource
 
                 \Filament\Schemas\Components\Section::make('Details')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('tip_type')
-                            ->label('Type'),
-                        \Filament\Infolists\Components\TextEntry::make('location')
-                            ->label('Location'),
+                        \Filament\Schemas\Components\Grid::make(2)
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('tip_type')
+                                    ->label('Type'),
+                                \Filament\Infolists\Components\TextEntry::make('location')
+                                    ->label('Location'),
+                            ]),
                         \Filament\Infolists\Components\TextEntry::make('description')
                             ->label('Description')
                             ->columnSpanFull()
@@ -348,6 +351,21 @@ class TipResource extends Resource
                             ->label('Suspect Details')
                             ->columnSpanFull(),
                     ]),
+
+                \Filament\Schemas\Components\Section::make('Evidence & Attachments')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('evidence_description')
+                            ->label('Description of Evidence')
+                            ->placeholder('No description provided'),
+                        \Filament\Infolists\Components\TextEntry::make('evidence_files')
+                            ->label('Attached Files')
+                            ->badge()
+                            ->separator(',')
+                            ->formatStateUsing(fn($state) => basename($state))
+                            ->url(fn($state) => asset('storage/' . $state), true)
+                            ->placeholder('No attachments provided'),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

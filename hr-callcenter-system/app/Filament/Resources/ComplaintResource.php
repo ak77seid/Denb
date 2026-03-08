@@ -453,7 +453,14 @@ class ComplaintResource extends Resource
                     ->schema([
                         \Filament\Infolists\Components\TextEntry::make('evidence_description')
                             ->label('Description of Evidence')
-                            ->default('No evidence provided'),
+                            ->placeholder('No description provided'),
+                        \Filament\Infolists\Components\TextEntry::make('attachments')
+                            ->label('Attached Files')
+                            ->badge()
+                            ->separator(',')
+                            ->formatStateUsing(fn($state) => basename($state))
+                            ->url(fn($state) => asset('storage/' . $state), true)
+                            ->placeholder('No attachments provided'),
                     ])
                     ->collapsible(),
             ]);

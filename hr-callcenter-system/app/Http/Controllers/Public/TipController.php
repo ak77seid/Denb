@@ -41,8 +41,8 @@ class TipController extends Controller
             'suspect_vehicle' => 'nullable|string|max:255',
             'suspect_company' => 'nullable|string|max:255',
             'has_evidence' => 'sometimes|boolean',
-            'evidence_description' => 'required_if:has_evidence,true|nullable|string|max:1000',
-            'evidence_files.*' => 'nullable|file|max:20480|mimes:jpg,jpeg,png,mp4,mov,pdf',
+            'evidence_description' => 'nullable|string|max:1000',
+            'evidence_files.*' => 'nullable|file|max:20480|mimes:jpg,jpeg,png,mp4,mov,pdf,doc,docx,xls,xlsx,txt',
             'urgency_level' => 'required|string|in:low,medium,high,immediate',
             'is_ongoing' => 'sometimes|boolean',
         ]);
@@ -77,11 +77,11 @@ class TipController extends Controller
                 );
                 $files[] = $path;
             }
-            $data['evidence_files'] = json_encode($files);
+            $data['evidence_files'] = $files;
         }
 
         // Set boolean flags
-        $data['has_evidence'] = $request->has('has_evidence');
+        $data['has_evidence'] = $request->hasFile('evidence_files') || !empty($request->evidence_description);
         $data['is_ongoing'] = $request->has('is_ongoing');
 
         // Create tip

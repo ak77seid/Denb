@@ -40,7 +40,8 @@ class Complaint extends Model
         'resolved_by',
         'last_viewed_by_complainant',
         'view_count',
-        'is_anonymous'
+        'is_anonymous',
+        'evidence_description'
     ];
 
     protected $casts = [
@@ -83,10 +84,12 @@ class Complaint extends Model
         return $this->morphMany(CaseUpdate::class, 'caseable');
     }
 
+    /*
     public function communications()
     {
         return $this->morphMany(CaseCommunication::class, 'caseable');
     }
+    */
 
     public function assignments()
     {
@@ -152,7 +155,7 @@ class Complaint extends Model
             'low' => 'ዝቅተኛ',
             'medium' => 'መካከለኛ',
             'high' => 'ከፍተኛ',
-            'urgent' => 'አስቸኳይ'
+            'critical' => 'በጣም አስቸኳይ'
         ];
 
         return $priorities[$this->priority] ?? $this->priority;
@@ -161,12 +164,13 @@ class Complaint extends Model
     public function getComplaintTypeNameAttribute()
     {
         $types = [
-            'goods_confiscation' => 'እቃ መንጠቅ',
-            'officer_misconduct' => 'የሰራተኛ ስነምግባር',
-            'service_delivery' => 'የአገልግሎት አሰጣጥ',
-            'uniform_issue' => 'የዩኒፎርም ችግር',
-            'salary_issue' => 'የደመወዝ ችግር',
-            'harassment' => 'ትንኮሳ',
+            'illegal_trade' => 'ህገ-ወጥ ንግድ',
+            'corruption' => 'ሙስና',
+            'misconduct' => 'የፖሊስ/የሰራተኛ ጥፋት',
+            'property_dispute' => 'የንብረት ክርክር',
+            'harassment' => 'ትንኮሳ/ማስፈራራት',
+            'fraud' => 'ማጭበርበር',
+            'environmental' => 'የአካባቢ ጥሰት',
             'other' => 'ሌላ'
         ];
 

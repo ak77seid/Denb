@@ -42,9 +42,14 @@
 
           {{-- Step 1: Complainant Info --}}
           <div class="card form-card mb-4" data-aos="fade-up">
-            <div class="card-header py-3" style="background: linear-gradient(135deg, #1e3a5f, #2d6a9f); color:white; border-radius: 12px 12px 0 0;">
-              <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Step 1 — Complainant Information</h5>
-              <small class="opacity-75">ቅሬታ አቅራቢ መረጃ</small>
+            <div class="form-section-header">
+              <div class="d-flex align-items-center gap-3">
+                <div class="form-step-badge">1</div>
+                <div>
+                  <h5 class="mb-0 fw-bold text-white"><i class="bi bi-person-circle me-2"></i>Complainant Information</h5>
+                  <small class="text-white mt-1 d-block" style="opacity:0.85; font-size:0.85rem;">ቅሬታ አቅራቢ መረጃ</small>
+                </div>
+              </div>
             </div>
             <div class="card-body p-4">
               <div class="row g-3">
@@ -80,15 +85,20 @@
 
           {{-- Step 2: Complaint Details --}}
           <div class="card form-card mb-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="card-header py-3" style="background: linear-gradient(135deg, #1e3a5f, #2d6a9f); color:white; border-radius: 12px 12px 0 0;">
-              <h5 class="mb-0"><i class="bi bi-file-text me-2"></i>Step 2 — Complaint Details</h5>
-              <small class="opacity-75">የቅሬታ ዝርዝር</small>
+            <div class="form-section-header">
+              <div class="d-flex align-items-center gap-3">
+                <div class="form-step-badge">2</div>
+                <div>
+                  <h5 class="mb-0 fw-bold text-white"><i class="bi bi-file-text me-2"></i>Complaint Details</h5>
+                  <small class="text-white mt-1 d-block" style="opacity:0.85; font-size:0.85rem;">የቅሬታ ዝርዝር</small>
+                </div>
+              </div>
             </div>
             <div class="card-body p-4">
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Complaint Type <span class="text-danger">*</span></label>
-                  <select name="complaint_type" class="form-select form-select-lg @error('complaint_type') is-invalid @enderror" required>
+                  <select name="complaint_type" id="complaint_type" class="form-select form-select-lg @error('complaint_type') is-invalid @enderror" required>
                     <option value="">-- Select Type --</option>
                     <option value="illegal_trade" {{ old('complaint_type') == 'illegal_trade' ? 'selected' : '' }}>Illegal Trade (ህገ-ወጥ ንግድ)</option>
                     <option value="corruption" {{ old('complaint_type') == 'corruption' ? 'selected' : '' }}>Corruption (ሙስና)</option>
@@ -100,6 +110,12 @@
                     <option value="other" {{ old('complaint_type') == 'other' ? 'selected' : '' }}>Other (ሌላ)</option>
                   </select>
                   @error('complaint_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6" id="other_type_container" style="display: {{ old('complaint_type') == 'other' ? 'block' : 'none' }};">
+                  <label class="form-label fw-semibold">Please Specify Type <span class="text-danger">*</span></label>
+                  <input type="text" name="complaint_type_other" class="form-control form-control-lg @error('complaint_type_other') is-invalid @enderror"
+                    value="{{ old('complaint_type_other') }}" placeholder="Specify the complaint type">
+                  @error('complaint_type_other')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-semibold">Priority <span class="text-danger">*</span></label>
@@ -117,6 +133,18 @@
                   <input type="text" name="subject" class="form-control form-control-lg @error('subject') is-invalid @enderror"
                     value="{{ old('subject') }}" placeholder="Brief subject of your complaint" required>
                   @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Evidence Description <span class="badge bg-secondary ms-2" style="font-size:0.65rem;">Optional</span></label>
+                  <textarea name="evidence_description" class="form-control" rows="2" 
+                    placeholder="Briefly describe what the attached files show">{{ old('evidence_description') }}</textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Upload Files <span class="badge bg-secondary ms-2" style="font-size:0.65rem;">Optional</span></label>
+                  <input type="file" name="attachments[]" class="form-control form-control-lg @error('attachments') is-invalid @enderror"
+                    multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt">
+                  <div class="form-text">Accepted: JPG, PNG, PDF, Word, Excel, Text. Max 10MB per file.</div>
+                  @error('attachments')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-12">
                   <label class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
@@ -142,9 +170,14 @@
 
           {{-- Step 3: Evidence --}}
           <div class="card form-card mb-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="card-header py-3" style="background: linear-gradient(135deg, #1e3a5f, #2d6a9f); color:white; border-radius: 12px 12px 0 0;">
-              <h5 class="mb-0"><i class="bi bi-paperclip me-2"></i>Step 3 — Supporting Evidence (Optional)</h5>
-              <small class="opacity-75">ማስረጃ ያያይዙ</small>
+            <div class="form-section-header">
+              <div class="d-flex align-items-center gap-3">
+                <div class="form-step-badge">3</div>
+                <div>
+                  <h5 class="mb-0 fw-bold text-white"><i class="bi bi-paperclip me-2"></i>Supporting Evidence <span class="badge bg-white text-primary ms-2" style="font-size:0.65rem;">Optional</span></h5>
+                  <small class="text-white mt-1 d-block" style="opacity:0.85; font-size:0.85rem;">ማስረጃ ያያይዙ</small>
+                </div>
+              </div>
             </div>
             <div class="card-body p-4">
               <div class="row g-3">
@@ -196,4 +229,25 @@
   </div>
 </section>
 
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('complaint_type');
+        const otherContainer = document.getElementById('other_type_container');
+        const otherInput = otherContainer.querySelector('input');
+
+        if (typeSelect) {
+            typeSelect.addEventListener('change', function() {
+                if (this.value === 'other') {
+                    otherContainer.style.display = 'block';
+                    otherInput.setAttribute('required', 'required');
+                } else {
+                    otherContainer.style.display = 'none';
+                    otherInput.removeAttribute('required');
+                }
+            });
+        }
+    });
+</script>
+@endpush
 @endsection
